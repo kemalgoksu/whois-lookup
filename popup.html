@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <section id="whois-pane" class="tab-pane">
+      <header>
+        <div class="domain-info">
+          <h1 id="domain-name">...</h1>
+        </div>
+        <button id="refresh-btn" title="Refresh this lookup">&#8635;</button>
+      </header>
+
+      <div id="loading" class="state-view hidden">
+        <div class="spinner"></div>
+        <p>Querying WHOIS...</p>
+      </div>
+
+      <div id="error" class="state-view hidden"></div>
+
+      <section id="availability" class="card availability-card hidden">
+        <h3>Registration availability</h3>
+        <p>Possibly available</p>
+        <small>No registration record was found. Final availability is confirmed by the registrar.</small>
+        <button id="register-btn" class="primary-btn"></button>
+      </section>
+
+      <main id="results" class="hidden">
+        <section class="card">
+          <h3>Registration</h3>
+          <div class="grid-row"><span class="label">Registrar</span><span id="registrar" class="value">-</span></div>
+          <div class="grid-row"><span class="label">Created</span><span id="created" class="value">-</span></div>
+          <div class="grid-row"><span class="label">Updated</span><span id="updated" class="value">-</span></div>
+          <div class="grid-row"><span class="label">Expires</span><span id="expiry" class="value">-</span></div>
+        </section>
+
+        <section class="card">
+          <h3>DNS &amp; Nameservers</h3>
+          <div id="nameservers-list" class="tag-container"></div>
+        </section>
+
+        <section class="card">
+          <h3>Domain Status</h3>
+          <div id="status-container" class="tag-container"></div>
+        </section>
+
+        <footer>
+          <span id="lookup-source">Registry lookup</span> &middot; cached <span id="cache-relative">just now</span>
+          <span id="cache-exact"></span>
+        </footer>
+      </main>
+    </section>
+
+    <section id="settings-pane" class="tab-pane hidden">
+      <h2 class="settings-title">Settings</h2>
+      <p class="settings-intro">Customize registration links and manage saved lookup data.</p>
+
+      <section class="card settings-card">
+        <h3>Registration</h3>
+        <label for="registrar-select">Preferred registrar</label>
+        <select id="registrar-select">
+          <option value="namecheap">Namecheap</option>
+          <option value="porkbun">Porkbun</option>
+          <option value="godaddy">GoDaddy</option>
+          <option value="namecom">Name.com</option>
+        </select>
+        <p class="setting-help">Used for the registration button when a domain appears to be available.</p>
+      </section>
+
+      <section class="card settings-card">
+        <h3>Cache</h3>
+        <button id="clear-cache-btn" class="secondary-btn">Clear lookup cache</button>
+        <p id="settings-status" class="settings-status" aria-live="polite"></p>
+      </section>
+    </section>
+
+    <nav class="view-nav" aria-label="Popup navigation">
+      <button id="whois-tab" class="nav-action hidden"><span aria-hidden="true">&larr;</span> Back to WHOIS</button>
+      <button id="settings-tab" class="nav-action" title="Open settings"><span aria-hidden="true">&#9881;</span> Settings</button>
+    </nav>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

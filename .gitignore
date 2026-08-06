@@ -1,0 +1,16 @@
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local packages and signing output
+web-ext-artifacts/
+*.xpi
+*.zip
+
+# Logs and temporary files
+*.log
+*.tmp

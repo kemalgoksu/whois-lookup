@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Pro WHOIS Look",
+  "version": "2.0",
+  "description": "Look up domain registration, registrar, dates, nameservers, and status from the Firefox toolbar.",
+  "permissions": ["storage", "tabs", "unlimitedStorage"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "action": {
+    "default_title": "Pro WHOIS Look",
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "48": "icon.png"
+  }
+}
