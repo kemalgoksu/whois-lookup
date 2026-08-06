@@ -5,11 +5,13 @@ Pro WHOIS Look is a lightweight Firefox extension that shows registration detail
 ## Features
 
 - Detects the domain in the active tab
+- Clearly discloses that the current domain is sent for lookup
 - Shows the registrar, creation/update/expiration dates, nameservers, and domain status
 - Caches lookups locally for one hour
 - Indicates when a domain may be available
 - Opens a configurable registrar for a final availability check
 - Lets you clear cached lookup data from the settings view
+- Does not cache lookup results from private browsing windows
 
 ## Install locally
 
@@ -20,6 +22,8 @@ Pro WHOIS Look is a lightweight Firefox extension that shows registration detail
 5. Choose `manifest.json` from this folder.
 
 Temporary add-ons are removed when Firefox restarts. For permanent distribution, package and sign the extension through [Firefox Add-ons](https://addons.mozilla.org/developers/).
+
+Firefox 140 or newer is required so Firefox can display its built-in browsing-data transmission consent during installation.
 
 ## How it works
 
@@ -42,7 +46,7 @@ Before submitting a change:
 - `manifest.json` — Firefox Manifest V3 configuration
 - `background.js` — RDAP/WHOIS lookup and bootstrap caching
 - `popup.html`, `popup.css`, `popup.js` — popup interface and local result cache
-- `icon.png` — packaged toolbar icon
+- `icons/` — packaged toolbar and Add-ons Manager icons
 
 ## Contributing
 

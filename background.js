@@ -39,7 +39,8 @@ async function getBaseRdapUrl(tld) {
   const service = bootstrap.services.find(s => s[0].includes(tld.toLowerCase()));
   
   if (service && service[1] && service[1].length > 0) {
-    return service[1][0]; // Return the first primary RDAP URL
+    // Host access is HTTPS-only, so ignore insecure registry endpoints.
+    return service[1].find(url => url.startsWith("https://")) || null;
   }
   return null;
 }
