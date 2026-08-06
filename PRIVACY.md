@@ -17,10 +17,12 @@ These third-party services may process requests according to their own privacy p
 
 The extension stores the IANA bootstrap data, lookup results, lookup timestamps, and your preferred registrar in Firefox's local extension storage. Lookup results expire for display purposes after one hour. You can remove cached lookup results from the extension's settings.
 
+Lookup results from private browsing windows are not stored. The IANA bootstrap data and preferred registrar setting remain available because they are not private browsing-history data.
+
 The extension does not transmit locally stored preferences or cached results to the developer.
 
 ## Permissions
 
-- `tabs` reads the active tab URL so the extension can identify its domain.
-- `storage` and `unlimitedStorage` keep bootstrap data, preferences, and lookup results locally.
-- `<all_urls>` allows direct requests to registry RDAP servers, whose hosts vary by top-level domain.
+- `activeTab` reads the current tab URL after you open the extension so it can identify the domain.
+- `storage` keeps bootstrap data, preferences, and non-private lookup results locally.
+- `https://*/*` allows encrypted requests to registry RDAP servers, whose hosts vary by top-level domain.

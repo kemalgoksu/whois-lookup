@@ -3,17 +3,32 @@
   "name": "Pro WHOIS Look",
   "version": "2.0",
   "description": "Look up domain registration, registrar, dates, nameservers, and status from the Firefox toolbar.",
-  "permissions": ["storage", "tabs", "unlimitedStorage"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["https://*/*"],
   "background": {
     "scripts": ["background.js"]
   },
   "action": {
     "default_title": "Pro WHOIS Look",
     "default_popup": "popup.html",
-    "default_icon": "icon.png"
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    }
   },
   "icons": {
-    "48": "icon.png"
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "pro-whois-look@kemalgoksu.github.io",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["browsingActivity"]
+      }
+    }
   }
 }

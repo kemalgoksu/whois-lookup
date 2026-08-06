@@ -11,6 +11,7 @@ const REGISTRARS = {
 };
 let preferredRegistrar = DEFAULT_REGISTRAR;
 let currentDomain = '';
+let isPrivateLookup = false;
 const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto', style: 'short' });
 const dateFormatter = new Intl.DateTimeFormat('en-GB', { 
     day: '2-digit', 
@@ -74,6 +75,7 @@ async function init() {
     await initSettings();
     const tabs = await browser.tabs.query({ active: true, currentWindow: true });
     if (!tabs[0]?.url) return;
+    isPrivateLookup = Boolean(tabs[0].incognito);
 
     const url = new URL(tabs[0].url);
     const fullHostname = url.hostname;
@@ -84,7 +86,7 @@ async function init() {
     document.getElementById('domain-name').textContent = baseDomain;
 
     // Check Cache
-    const cached = await browser.storage.local.get(baseDomain);
+    const cached = isPrivateLookup ? {} : await browser.storage.local.get(baseDomain);
     const now = Date.now();
 
     if (cached[baseDomain] && (now - cached[baseDomain].timestamp < CACHE_DURATION)) {
@@ -177,7 +179,9 @@ async function fetchWhois(domain) {
         const timestamp = Date.now();
 
         // Save to cache
-        await browser.storage.local.set({ [domain]: { data, timestamp } });
+        if (!isPrivateLookup) {
+            await browser.storage.local.set({ [domain]: { data, timestamp } });
+        }
         displayData(data, timestamp);
     } catch (err) {
         showError(err.message);
@@ -193,8 +197,9 @@ function displayData(data, timestamp) {
 
     // 1. Cache footer relative time
     const cacheMinutes = Math.round((timestamp - Date.now()) / 60000);
-    document.getElementById('cache-relative').textContent = 
-        cacheMinutes === 0 ? "just now" : rtf.format(cacheMinutes, 'minute');
+    document.getElementById('cache-status').textContent = isPrivateLookup
+        ? 'not cached (private window)'
+        : `cached ${cacheMinutes === 0 ? "just now" : rtf.format(cacheMinutes, 'minute')}`;
     document.getElementById('lookup-source').textContent =
         data._lookupSource === 'WHOIS' ? 'Classic WHOIS' : 'RDAP';
 

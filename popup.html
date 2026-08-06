@@ -17,6 +17,7 @@
       <div id="loading" class="state-view hidden">
         <div class="spinner"></div>
         <p>Querying WHOIS...</p>
+        <small>The current domain is sent to its registry or the fallback WHOIS service.</small>
       </div>
 
       <div id="error" class="state-view hidden"></div>
@@ -48,8 +49,7 @@
         </section>
 
         <footer>
-          <span id="lookup-source">Registry lookup</span> &middot; cached <span id="cache-relative">just now</span>
-          <span id="cache-exact"></span>
+          <span id="lookup-source">Registry lookup</span> &middot; <span id="cache-status">cached just now</span>
         </footer>
       </main>
     </section>
