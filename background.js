@@ -148,6 +148,6 @@ browser.runtime.onMessage.addListener(async (message) => {
   }
 });
 
-// Update bootstrap on install/startup
+// Seed the bootstrap cache on install. Later lookups refresh it when it is
+// older than BOOTSTRAP_MAX_AGE.
 browser.runtime.onInstalled.addListener(updateBootstrap);
-browser.runtime.onStartup.addListener(updateBootstrap);
