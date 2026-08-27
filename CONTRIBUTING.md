@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve Pro WHOIS Look.
+Thanks for helping improve WHOIS Lookup.
 
 ## Workflow
 

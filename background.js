@@ -1,13 +1,29 @@
 const IANA_DNS_BOOTSTRAP = "https://data.iana.org/rdap/dns.json";
 const WHOIS_FALLBACK_URL = "https://who-dat.as93.net/";
 const BOOTSTRAP_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+const REQUEST_TIMEOUT = 20 * 1000;
 const POSSIBLY_AVAILABLE = "Possibly available — no registration record was found.";
+
+function fetchWithTimeout(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT)
+  });
+}
 
 // 1. Fetch and Cache the TLD map from IANA
 async function updateBootstrap() {
   try {
-    const response = await fetch(IANA_DNS_BOOTSTRAP);
+    const response = await fetchWithTimeout(IANA_DNS_BOOTSTRAP, {
+      headers: { "Accept": "application/json" }
+    });
+    if (!response.ok) {
+      throw new Error(`IANA bootstrap error (${response.status})`);
+    }
     const data = await response.json();
+    if (!Array.isArray(data.services)) {
+      throw new Error("IANA bootstrap response is invalid.");
+    }
     // Store with a timestamp
     await browser.storage.local.set({ 
       bootstrap: data, 
@@ -47,7 +63,7 @@ async function getBaseRdapUrl(tld) {
 
 // Convert the fallback service response to the small RDAP subset used by popup.js.
 function normalizeWhois(data, requestedDomain) {
-  const domain = data.domain || data;
+  const record = data.domain && typeof data.domain === "object" ? data.domain : data;
   const registrar = data.registrar || {};
   const value = (...values) => values.find(item => item !== undefined && item !== null && item !== "");
   const list = (...values) => {
@@ -56,19 +72,19 @@ function normalizeWhois(data, requestedDomain) {
     return Array.isArray(found) ? found : [found];
   };
 
-  const registrarName = value(registrar.name, domain.registrar, data.registrar_name);
+  const registrarName = value(registrar.name, record.registrar, data.registrar_name);
   const created = value(
-    domain.created_date,
-    domain.creation_date,
+    record.created_date,
+    record.creation_date,
     data.created_date,
     data.creation_date,
     data.dates?.created
   );
-  const updated = value(domain.updated_date, data.updated_date, data.dates?.updated);
+  const updated = value(record.updated_date, data.updated_date, data.dates?.updated);
   const expires = value(
-    domain.expiration_date,
-    domain.expiry_date,
-    domain.expires_date,
+    record.expiration_date,
+    record.expiry_date,
+    record.expires_date,
     data.expiration_date,
     data.expiry_date,
     data.dates?.expires
@@ -80,24 +96,30 @@ function normalizeWhois(data, requestedDomain) {
   if (expires) events.push({ eventAction: "expiration", eventDate: expires });
 
   return {
-    ldhName: value(domain.domain, domain.name, data.domain_name, requestedDomain),
+    ldhName: value(
+      typeof data.domain === "string" ? data.domain : undefined,
+      record.domain,
+      record.name,
+      data.domain_name,
+      requestedDomain
+    ),
     entities: registrarName ? [{
       roles: ["registrar"],
       vcardArray: ["vcard", [["fn", {}, "text", registrarName]]]
     }] : [],
     events,
-    nameservers: list(domain.name_servers, data.name_servers, data.nameservers)
+    nameservers: list(record.name_servers, data.name_servers, data.nameservers)
       .filter(Boolean)
       .map(item => value(item?.name, item?.ldhName, item))
       .filter(name => typeof name === "string")
       .map(name => ({ ldhName: name.replace(/\.$/, "") })),
-    status: list(domain.status, data.status).filter(Boolean).map(String),
+    status: list(record.status, data.status).filter(Boolean).map(String),
     _lookupSource: "WHOIS"
   };
 }
 
 async function fetchClassicWhois(domain) {
-  const response = await fetch(`${WHOIS_FALLBACK_URL}${encodeURIComponent(domain)}`, {
+  const response = await fetchWithTimeout(`${WHOIS_FALLBACK_URL}${encodeURIComponent(domain)}`, {
     method: "GET",
     headers: { "Accept": "application/json" }
   });
@@ -106,7 +128,9 @@ async function fetchClassicWhois(domain) {
   if (!response.ok) throw new Error(`WHOIS service error (${response.status})`);
 
   const data = await response.json();
-  if (data.error) throw new Error(data.error);
+  if (data.error) {
+    throw new Error(data.error.message || String(data.error));
+  }
   if (data.isRegistered === false) {
     throw new Error(POSSIBLY_AVAILABLE);
   }
@@ -116,7 +140,7 @@ async function fetchClassicWhois(domain) {
 browser.runtime.onMessage.addListener(async (message) => {
   if (message.action === "fetchWhois") {
     const domain = String(message.domain || "").toLowerCase();
-    if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(domain)) {
+    if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(domain)) {
       return { error: "Invalid domain name." };
     }
     const parts = domain.split('.');
@@ -128,7 +152,7 @@ browser.runtime.onMessage.addListener(async (message) => {
 
       // Direct query to the Registry server (no rdap.org redirect)
       const queryUrl = `${baseUrl.replace(/\/?$/, "/")}domain/${encodeURIComponent(domain)}`;
-      const response = await fetch(queryUrl, {
+      const response = await fetchWithTimeout(queryUrl, {
         method: 'GET',
         headers: { 'Accept': 'application/rdap+json' }
       });
@@ -143,6 +167,7 @@ browser.runtime.onMessage.addListener(async (message) => {
       return { data };
     } catch (err) {
       if (err.message === POSSIBLY_AVAILABLE) return { possiblyAvailable: true };
+      if (err.name === "TimeoutError") return { error: "The registry lookup timed out." };
       return { error: err.message || "The registry lookup failed." };
     }
   }

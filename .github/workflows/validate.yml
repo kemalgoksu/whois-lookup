@@ -21,3 +21,7 @@ jobs:
         run: |
           node --check background.js
           node --check popup.js
+      - name: Run Mozilla extension linter
+        run: npx --yes web-ext@10.6.0 lint
+      - name: Verify submission package builds
+        run: npx --yes web-ext@10.6.0 build --overwrite-dest

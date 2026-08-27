@@ -1,6 +1,6 @@
 # Privacy
 
-Pro WHOIS Look does not include analytics, advertising, or user accounts.
+WHOIS Lookup does not include analytics, advertising, or user accounts.
 
 ## Data sent over the network
 

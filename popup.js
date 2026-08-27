@@ -4,10 +4,16 @@
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 const DEFAULT_REGISTRAR = 'namecheap';
 const REGISTRARS = {
-    namecheap: { name: 'Namecheap', getUrl: domain => `https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(domain)}` },
+    dynadot: { name: 'Dynadot', getUrl: domain => `https://www.dynadot.com/domain/search?domain=${encodeURIComponent(domain)}` },
     porkbun: { name: 'Porkbun', getUrl: domain => `https://porkbun.com/checkout/search?q=${encodeURIComponent(domain)}` },
+    spaceship: { name: 'Spaceship', getUrl: domain => `https://www.spaceship.com/domain-search/?query=${encodeURIComponent(domain)}` },
+    namecheap: { name: 'Namecheap', getUrl: domain => `https://www.namecheap.com/domains/registration/results/?domain=${encodeURIComponent(domain)}` },
     godaddy: { name: 'GoDaddy', getUrl: domain => `https://www.godaddy.com/domainsearch/find?domainToCheck=${encodeURIComponent(domain)}` },
-    namecom: { name: 'Name.com', getUrl: domain => `https://www.name.com/domain/search/${encodeURIComponent(domain)}` }
+    namecom: { name: 'Name.com', getUrl: domain => `https://www.name.com/domain/search/${encodeURIComponent(domain)}` },
+    cloudflare: { name: 'Cloudflare Registrar', getUrl: domain => `https://domains.cloudflare.com/?domain=${encodeURIComponent(domain)}` },
+    squarespace: { name: 'Squarespace Domains', getUrl: domain => `https://domains.squarespace.com/domain-search?query=${encodeURIComponent(domain)}` },
+    hostinger: { name: 'Hostinger', getUrl: domain => `https://www.hostinger.com/domain-name-search?domain=${encodeURIComponent(domain)}` },
+    namesilo: { name: 'NameSilo', getUrl: domain => `https://www.namesilo.com/domain/search-domains?query=${encodeURIComponent(domain)}` }
 };
 let preferredRegistrar = DEFAULT_REGISTRAR;
 let currentDomain = '';
@@ -39,16 +45,27 @@ function getRelativeDistance(date) {
     return rtf.format(diffInYears, 'year');
 }
 
-// Formats a date string into "DD/MM/YYYY (relative)"
-function formatDateWithRelative(dateString) {
-    if (!dateString) return "N/A";
+// Renders a date as "relative DD/MM/YYYY" without injecting HTML.
+function renderDateWithRelative(element, dateString) {
+    element.replaceChildren();
+    if (!dateString) {
+        element.textContent = 'N/A';
+        return;
+    }
     const date = new Date(dateString);
-    if (isNaN(date)) return "N/A";
+    if (isNaN(date)) {
+        element.textContent = 'N/A';
+        return;
+    }
 
-    const formatted = dateFormatter.format(date);
-    const relative = getRelativeDistance(date);
-    
-    return `<span class="date-relative">(${relative})</span> <span class="value-main">${formatted}</span>`;
+    const relative = document.createElement('span');
+    relative.className = 'date-relative';
+    relative.textContent = `(${getRelativeDistance(date)})`;
+
+    const value = document.createElement('span');
+    value.className = 'value-main';
+    value.textContent = dateFormatter.format(date);
+    element.append(relative, ' ', value);
 }
 
 // Logic to turn aistudio.google.com -> google.com 
@@ -74,11 +91,27 @@ function getBaseDomain(hostname) {
 async function init() {
     await initSettings();
     const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-    if (!tabs[0]?.url) return;
+    if (!tabs[0]?.url) {
+        showUnsupportedPage();
+        return;
+    }
     isPrivateLookup = Boolean(tabs[0].incognito);
 
-    const url = new URL(tabs[0].url);
-    const fullHostname = url.hostname;
+    let url;
+    try {
+        url = new URL(tabs[0].url);
+    } catch {
+        showUnsupportedPage();
+        return;
+    }
+
+    const isIpAddress = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(url.hostname) || url.hostname.includes(':');
+    if (!['http:', 'https:'].includes(url.protocol) || !url.hostname || isIpAddress) {
+        showUnsupportedPage();
+        return;
+    }
+
+    const fullHostname = url.hostname.replace(/\.$/, '').toLowerCase();
     const baseDomain = getBaseDomain(fullHostname);
     currentDomain = baseDomain;
 
@@ -96,6 +129,12 @@ async function init() {
     }
 
     document.getElementById('refresh-btn').onclick = () => fetchWhois(baseDomain);
+}
+
+function showUnsupportedPage() {
+    document.getElementById('domain-name').textContent = 'No website domain';
+    document.getElementById('refresh-btn').disabled = true;
+    showError('Open an HTTP or HTTPS website with a domain name, then try again.');
 }
 
 async function initSettings() {
@@ -212,13 +251,13 @@ function displayData(data, timestamp) {
     const events = data.events || [];
     const getEventDate = (action) => events.find(e => e.eventAction === action)?.eventDate;
 
-    document.getElementById('created').innerHTML = formatDateWithRelative(getEventDate('registration'));
-    document.getElementById('updated').innerHTML = formatDateWithRelative(getEventDate('last changed'));
-    document.getElementById('expiry').innerHTML = formatDateWithRelative(getEventDate('expiration'));
+    renderDateWithRelative(document.getElementById('created'), getEventDate('registration'));
+    renderDateWithRelative(document.getElementById('updated'), getEventDate('last changed'));
+    renderDateWithRelative(document.getElementById('expiry'), getEventDate('expiration'));
 
     // 4. Nameservers
     const nsContainer = document.getElementById('nameservers-list');
-    nsContainer.innerHTML = '';
+    nsContainer.replaceChildren();
     if (data.nameservers && data.nameservers.length > 0) {
         data.nameservers.forEach(ns => {
             const span = document.createElement('span');
@@ -232,13 +271,14 @@ function displayData(data, timestamp) {
 
     // 5. Status Tags
     const statusContainer = document.getElementById('status-container');
-    statusContainer.innerHTML = '';
+    statusContainer.replaceChildren();
     (data.status || []).forEach(s => {
         const span = document.createElement('span');
         span.className = 'status-tag';
         span.textContent = s.replace(/ /g, '-');
         statusContainer.appendChild(span);
     });
+    if (!statusContainer.children.length) statusContainer.textContent = 'N/A';
 }
 
 function showPossiblyAvailable(domain) {

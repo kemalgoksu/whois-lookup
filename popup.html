@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WHOIS Lookup</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -11,7 +13,7 @@
         <div class="domain-info">
           <h1 id="domain-name">...</h1>
         </div>
-        <button id="refresh-btn" title="Refresh this lookup">&#8635;</button>
+        <button id="refresh-btn" type="button" title="Refresh this lookup" aria-label="Refresh this lookup">&#8635;</button>
       </header>
 
       <div id="loading" class="state-view hidden">
@@ -26,7 +28,7 @@
         <h3>Registration availability</h3>
         <p>Possibly available</p>
         <small>No registration record was found. Final availability is confirmed by the registrar.</small>
-        <button id="register-btn" class="primary-btn"></button>
+        <button id="register-btn" class="primary-btn" type="button"></button>
       </section>
 
       <main id="results" class="hidden">
@@ -62,24 +64,30 @@
         <h3>Registration</h3>
         <label for="registrar-select">Preferred registrar</label>
         <select id="registrar-select">
-          <option value="namecheap">Namecheap</option>
+          <option value="dynadot">Dynadot</option>
           <option value="porkbun">Porkbun</option>
+          <option value="spaceship">Spaceship</option>
+          <option value="namecheap">Namecheap</option>
           <option value="godaddy">GoDaddy</option>
           <option value="namecom">Name.com</option>
+          <option value="cloudflare">Cloudflare Registrar</option>
+          <option value="squarespace">Squarespace Domains</option>
+          <option value="hostinger">Hostinger</option>
+          <option value="namesilo">NameSilo</option>
         </select>
         <p class="setting-help">Used for the registration button when a domain appears to be available.</p>
       </section>
 
       <section class="card settings-card">
         <h3>Cache</h3>
-        <button id="clear-cache-btn" class="secondary-btn">Clear lookup cache</button>
+        <button id="clear-cache-btn" class="secondary-btn" type="button">Clear lookup cache</button>
         <p id="settings-status" class="settings-status" aria-live="polite"></p>
       </section>
     </section>
 
     <nav class="view-nav" aria-label="Popup navigation">
-      <button id="whois-tab" class="nav-action hidden"><span aria-hidden="true">&larr;</span> Back to WHOIS</button>
-      <button id="settings-tab" class="nav-action" title="Open settings"><span aria-hidden="true">&#9881;</span> Settings</button>
+      <button id="whois-tab" class="nav-action hidden" type="button"><span aria-hidden="true">&larr;</span> Back to WHOIS</button>
+      <button id="settings-tab" class="nav-action" type="button" title="Open settings"><span aria-hidden="true">&#9881;</span> Settings</button>
     </nav>
   </div>
   <script src="popup.js"></script>
