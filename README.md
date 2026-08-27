@@ -58,4 +58,4 @@ Bug reports and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md
 
 ## License
 
-No license has been selected yet. Until a license file is added, copyright law reserves all rights to the repository owner.
+This project is open source and available under the [MIT License](LICENSE).
