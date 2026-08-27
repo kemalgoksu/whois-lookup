@@ -9,6 +9,7 @@
     "scripts": ["background.js"]
   },
   "action": {
+    "default_area": "navbar",
     "default_title": "WHOIS Lookup",
     "default_popup": "popup.html",
     "default_icon": {
