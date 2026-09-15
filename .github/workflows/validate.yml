@@ -21,6 +21,8 @@ jobs:
         run: |
           node --check background.js
           node --check popup.js
+      - name: Run behavior tests
+        run: node --test tests/extension.test.cjs
       - name: Run Mozilla extension linter
         run: npx --yes web-ext@10.6.0 lint
       - name: Verify submission package builds

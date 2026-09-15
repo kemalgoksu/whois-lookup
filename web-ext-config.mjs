@@ -1,5 +1,6 @@
 export default {
   ignoreFiles: [
+    "tests/**",
     "README.md",
     "PRIVACY.md",
     "CONTRIBUTING.md",

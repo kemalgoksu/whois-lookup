@@ -37,7 +37,7 @@ There is no build step or dependency installation. Edit the HTML, CSS, JavaScrip
 
 Before submitting a change:
 
-1. Run `npx --yes web-ext@10.6.0 lint`.
+1. Run `node --test tests/extension.test.cjs` and `npx --yes web-ext@10.6.0 lint`.
 2. Reload the extension without errors.
 3. Test a registered domain, an unregistered domain, settings persistence, and cache clearing.
 4. Run `npx --yes web-ext@10.6.0 build --overwrite-dest` and upload the ZIP from `web-ext-artifacts/`.

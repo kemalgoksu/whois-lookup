@@ -9,6 +9,7 @@ Requires Node.js 22 or newer. There is no source compilation or minification.
 The files in the package are the human-readable source files.
 
 ```sh
+node --test tests/extension.test.cjs
 npx --yes web-ext@10.6.0 lint
 npx --yes web-ext@10.6.0 build --overwrite-dest
 ```
@@ -68,7 +69,7 @@ clearing, and a private window.
 
 - Confirm that the manifest ID is the permanent ID you want to keep for all
   future versions.
-- Choose an AMO license. The repository currently declares all rights reserved.
+- Select the MIT license in AMO to match the repository's `LICENSE` file.
 - Provide support contact details and at least one listing screenshot.
 - If the add-on should support Firefox for Android, test it there and add the
   appropriate `gecko_android` manifest settings. The current submission targets
