@@ -5,6 +5,9 @@ export default {
     "PRIVACY.md",
     "CONTRIBUTING.md",
     "AMO_SUBMISSION.md",
+    "manifest.chrome.json",
+    "scripts/**",
+    "build/**",
     "web-ext-config.mjs"
   ]
 };

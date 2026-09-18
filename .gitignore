@@ -8,6 +8,7 @@ Thumbs.db
 
 # Local packages and signing output
 web-ext-artifacts/
+build/
 *.xpi
 *.zip
 

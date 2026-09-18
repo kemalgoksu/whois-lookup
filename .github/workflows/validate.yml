@@ -16,13 +16,17 @@ jobs:
         with:
           node-version: 22
       - name: Validate manifest JSON
-        run: node -e "JSON.parse(require('fs').readFileSync('manifest.json', 'utf8'))"
+        run: node -e "for (const file of ['manifest.json', 'manifest.chrome.json']) JSON.parse(require('fs').readFileSync(file, 'utf8'))"
       - name: Check JavaScript syntax
         run: |
           node --check background.js
           node --check popup.js
       - name: Run behavior tests
         run: node --test tests/extension.test.cjs
+      - name: Build browser-specific extensions
+        run: node scripts/build.mjs
+      - name: Verify generated manifests
+        run: node -e "for (const file of ['build/firefox/manifest.json', 'build/chrome/manifest.json']) JSON.parse(require('fs').readFileSync(file, 'utf8'))"
       - name: Run Mozilla extension linter
         run: npx --yes web-ext@10.6.0 lint
       - name: Verify submission package builds

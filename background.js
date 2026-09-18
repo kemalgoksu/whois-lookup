@@ -3,6 +3,7 @@ const WHOIS_FALLBACK_URL = "https://who-dat.as93.net/";
 const BOOTSTRAP_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const REQUEST_TIMEOUT = 20 * 1000;
 const POSSIBLY_AVAILABLE = "Possibly available — no registration record was found.";
+const extensionApi = globalThis.browser ?? globalThis.chrome;
 
 function fetchWithTimeout(url, options = {}) {
   return fetch(url, {
@@ -25,9 +26,9 @@ async function updateBootstrap() {
       throw new Error("IANA bootstrap response is invalid.");
     }
     // Store with a timestamp
-    await browser.storage.local.set({ 
-      bootstrap: data, 
-      bootstrapTimestamp: Date.now() 
+    await extensionApi.storage.local.set({
+      bootstrap: data,
+      bootstrapTimestamp: Date.now()
     });
     console.log("IANA Bootstrap Map Updated.");
   } catch (err) {
@@ -37,7 +38,7 @@ async function updateBootstrap() {
 
 // 2. Find the direct RDAP URL for a TLD
 async function getBaseRdapUrl(tld) {
-  let { bootstrap, bootstrapTimestamp } = await browser.storage.local.get([
+  let { bootstrap, bootstrapTimestamp } = await extensionApi.storage.local.get([
     "bootstrap",
     "bootstrapTimestamp"
   ]);
@@ -45,7 +46,7 @@ async function getBaseRdapUrl(tld) {
   // If no bootstrap, or it's older than 7 days, refresh it
   if (!bootstrap || !bootstrapTimestamp || Date.now() - bootstrapTimestamp > BOOTSTRAP_MAX_AGE) {
     await updateBootstrap();
-    ({ bootstrap } = await browser.storage.local.get("bootstrap"));
+    ({ bootstrap } = await extensionApi.storage.local.get("bootstrap"));
   }
 
   if (!bootstrap?.services) return null;
@@ -137,7 +138,7 @@ async function fetchClassicWhois(domain) {
   return normalizeWhois(data, domain);
 }
 
-browser.runtime.onMessage.addListener(async (message) => {
+async function handleMessage(message) {
   if (message.action === "fetchWhois") {
     const domain = String(message.domain || "").toLowerCase();
     if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(domain)) {
@@ -171,8 +172,20 @@ browser.runtime.onMessage.addListener(async (message) => {
       return { error: err.message || "The registry lookup failed." };
     }
   }
+}
+
+// Returning a Promise from an onMessage listener is supported by Firefox, but
+// callback-style responses also work in Chrome versions that predate Promise
+// support for this API.
+extensionApi.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.action !== "fetchWhois") return false;
+
+  handleMessage(message).then(sendResponse, error => {
+    sendResponse({ error: error.message || "The registry lookup failed." });
+  });
+  return true;
 });
 
 // Seed the bootstrap cache on install. Later lookups refresh it when it is
 // older than BOOTSTRAP_MAX_AGE.
-browser.runtime.onInstalled.addListener(updateBootstrap);
+extensionApi.runtime.onInstalled.addListener(updateBootstrap);

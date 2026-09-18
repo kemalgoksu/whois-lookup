@@ -3,6 +3,7 @@
  */
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 const DEFAULT_REGISTRAR = 'namecheap';
+const extensionApi = globalThis.browser ?? globalThis.chrome;
 const REGISTRARS = {
     dynadot: { name: 'Dynadot', getUrl: domain => `https://www.dynadot.com/domain/search?domain=${encodeURIComponent(domain)}` },
     porkbun: { name: 'Porkbun', getUrl: domain => `https://porkbun.com/checkout/search?q=${encodeURIComponent(domain)}` },
@@ -90,7 +91,7 @@ function getBaseDomain(hostname) {
 
 async function init() {
     await initSettings();
-    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    const tabs = await extensionApi.tabs.query({ active: true, currentWindow: true });
     if (!tabs[0]?.url) {
         showUnsupportedPage();
         return;
@@ -119,7 +120,7 @@ async function init() {
     document.getElementById('domain-name').textContent = baseDomain;
 
     // Check Cache
-    const cached = isPrivateLookup ? {} : await browser.storage.local.get(baseDomain);
+    const cached = isPrivateLookup ? {} : await extensionApi.storage.local.get(baseDomain);
     const now = Date.now();
 
     if (cached[baseDomain] && (now - cached[baseDomain].timestamp < CACHE_DURATION)) {
@@ -139,7 +140,7 @@ function showUnsupportedPage() {
 
 async function initSettings() {
     initNavigation();
-    const stored = await browser.storage.local.get('preferredRegistrar');
+    const stored = await extensionApi.storage.local.get('preferredRegistrar');
     preferredRegistrar = REGISTRARS[stored.preferredRegistrar]
         ? stored.preferredRegistrar
         : DEFAULT_REGISTRAR;
@@ -148,14 +149,14 @@ async function initSettings() {
     select.value = preferredRegistrar;
     select.onchange = async () => {
         preferredRegistrar = select.value;
-        await browser.storage.local.set({ preferredRegistrar });
+        await extensionApi.storage.local.set({ preferredRegistrar });
         updateRegisterButton();
         showSettingsStatus('Preferred registrar saved.');
     };
 
     document.getElementById('clear-cache-btn').onclick = clearLookupCache;
     document.getElementById('register-btn').onclick = () => {
-        browser.tabs.create({ url: REGISTRARS[preferredRegistrar].getUrl(currentDomain) });
+        extensionApi.tabs.create({ url: REGISTRARS[preferredRegistrar].getUrl(currentDomain) });
     };
 }
 
@@ -177,12 +178,12 @@ function initNavigation() {
 }
 
 async function clearLookupCache() {
-    const stored = await browser.storage.local.get(null);
+    const stored = await extensionApi.storage.local.get(null);
     const lookupKeys = Object.entries(stored)
         .filter(([, item]) => item?.data && typeof item?.timestamp === 'number')
         .map(([key]) => key);
 
-    if (lookupKeys.length) await browser.storage.local.remove(lookupKeys);
+    if (lookupKeys.length) await extensionApi.storage.local.remove(lookupKeys);
     showSettingsStatus(lookupKeys.length ? 'Lookup cache cleared.' : 'Cache is already empty.');
 }
 
@@ -203,7 +204,7 @@ async function fetchWhois(domain) {
     toggleLoading(true);
     try {
         // Send message to background.js (which uses IANA bootstrap)
-        const response = await browser.runtime.sendMessage({
+        const response = await extensionApi.runtime.sendMessage({
             action: "fetchWhois",
             domain: domain
         });
@@ -219,7 +220,7 @@ async function fetchWhois(domain) {
 
         // Save to cache
         if (!isPrivateLookup) {
-            await browser.storage.local.set({ [domain]: { data, timestamp } });
+            await extensionApi.storage.local.set({ [domain]: { data, timestamp } });
         }
         displayData(data, timestamp);
     } catch (err) {

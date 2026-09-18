@@ -24,8 +24,38 @@ function setup(file, fetch = async () => { throw new Error('Unexpected request')
   });
   const source = fs.readFileSync(path.join(__dirname, '..', file), 'utf8');
   vm.runInContext(file === 'popup.js' ? source.replace(/init\(\);\s*$/, '') : source, context);
-  return { context, stored, nodes, lookup: domain => listener({ action: 'fetchWhois', domain }) };
+  return {
+    context,
+    stored,
+    nodes,
+    lookup: domain => new Promise((resolve, reject) => {
+      const result = listener({ action: 'fetchWhois', domain }, {}, resolve);
+      if (result && typeof result.then === 'function') result.then(resolve, reject);
+    })
+  };
 }
+
+test('runs with the Chrome API namespace when browser is unavailable', async () => {
+  const source = fs.readFileSync(path.join(__dirname, '..', 'background.js'), 'utf8');
+  let listener;
+  const chrome = {
+    storage: { local: { async get() { return {}; }, async set() {} } },
+    runtime: {
+      onMessage: { addListener(fn) { listener = fn; } },
+      onInstalled: { addListener() {} }
+    }
+  };
+  vm.runInNewContext(source, { console, AbortSignal, fetch, chrome });
+  assert.equal(typeof listener, 'function');
+});
+
+test('browser manifests use their supported Manifest V3 background formats', () => {
+  const firefox = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manifest.json')));
+  const chrome = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manifest.chrome.json')));
+  assert.deepEqual(firefox.background.scripts, ['background.js']);
+  assert.equal(chrome.background.service_worker, 'background.js');
+  assert.equal(chrome.browser_specific_settings, undefined);
+});
 
 test('rejects invalid domains without a request', async () => {
   const app = setup('background.js');

@@ -15,7 +15,7 @@ These third-party services may process requests according to their own privacy p
 
 ## Data stored locally
 
-The extension stores the IANA bootstrap data, lookup results, lookup timestamps, and your preferred registrar in Firefox's local extension storage. Lookup results expire for display purposes after one hour. You can remove cached lookup results from the extension's settings.
+The extension stores the IANA bootstrap data, lookup results, lookup timestamps, and your preferred registrar in the browser's local extension storage. Lookup results expire for display purposes after one hour. You can remove cached lookup results from the extension's settings.
 
 Lookup results from private browsing windows are not stored. The IANA bootstrap data and preferred registrar setting remain available because they are not private browsing-history data.
 
