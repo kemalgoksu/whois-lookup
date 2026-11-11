@@ -8,7 +8,7 @@ const browsers = {
   firefox: "manifest.json",
   chrome: "manifest.chrome.json"
 };
-const sharedFiles = ["background.js", "popup.css", "popup.html", "popup.js"];
+const sharedFiles = ["background.js", "popup.css", "popup.html", "popup.js", "domain.js", "i18n.js", "_locales", "vendor", "LICENSE"];
 
 await rm(outputRoot, { recursive: true, force: true });
 
@@ -17,7 +17,7 @@ for (const [browser, manifestFile] of Object.entries(browsers)) {
   await mkdir(output, { recursive: true });
 
   for (const file of sharedFiles) {
-    await cp(path.join(root, file), path.join(output, file));
+    await cp(path.join(root, file), path.join(output, file), { recursive: true });
   }
   await cp(path.join(root, "icons"), path.join(output, "icons"), { recursive: true });
   await writeFile(

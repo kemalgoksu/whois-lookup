@@ -21,12 +21,16 @@ jobs:
         run: |
           node --check background.js
           node --check popup.js
+          node --check domain.js
+          node --check i18n.js
       - name: Run behavior tests
         run: node --test tests/extension.test.cjs
       - name: Build browser-specific extensions
         run: node scripts/build.mjs
       - name: Verify generated manifests
         run: node -e "for (const file of ['build/firefox/manifest.json', 'build/chrome/manifest.json']) JSON.parse(require('fs').readFileSync(file, 'utf8'))"
+      - name: Verify packaged locales and parser
+        run: node scripts/verify-build.mjs
       - name: Run Mozilla extension linter
         run: npx --yes web-ext@10.6.0 lint
       - name: Verify submission package builds

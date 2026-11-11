@@ -1,0 +1,163 @@
+{
+  "dateFormat": {
+    "message": "日付形式"
+  },
+  "dateFormatAutomatic": {
+    "message": "自動 — $1",
+    "description": "$1 is an example date formatted using the browser regional locale."
+  },
+  "dateFormatHelp": {
+    "message": "自動ではブラウザーの地域設定に従います。すべての形式で端末のタイムゾーンを使用し、表示言語には依存しません。"
+  },
+  "dateFormatSaved": {
+    "message": "日付形式を保存しました。"
+  },
+  "extensionName": {
+    "message": "WHOIS Lookup"
+  },
+  "extensionDescription": {
+    "message": "いま開いているサイトや、気になるドメインの登録情報をブラウザーから確認できます。"
+  },
+  "refresh": {
+    "message": "検索を更新"
+  },
+  "editDomain": {
+    "message": "別のドメインを入力"
+  },
+  "domainLabel": {
+    "message": "ドメイン名またはウェブサイトのURL"
+  },
+  "lookup": {
+    "message": "検索"
+  },
+  "cancel": {
+    "message": "キャンセル"
+  },
+  "invalidDomain": {
+    "message": "有効なドメイン名またはHTTP/HTTPSのURLを入力してください。"
+  },
+  "loading": {
+    "message": "WHOISを検索中…"
+  },
+  "disclosure": {
+    "message": "検索するドメインは、レジストリまたは代替のWHOISサービスに送信されます。"
+  },
+  "availability": {
+    "message": "登録の可否"
+  },
+  "possiblyAvailable": {
+    "message": "登録できる可能性があります"
+  },
+  "availabilityHelp": {
+    "message": "登録情報が見つかりませんでした。最終的な登録可否はレジストラで確認してください。"
+  },
+  "registration": {
+    "message": "登録情報"
+  },
+  "registrar": {
+    "message": "レジストラ"
+  },
+  "created": {
+    "message": "作成日"
+  },
+  "updated": {
+    "message": "更新日"
+  },
+  "expires": {
+    "message": "有効期限"
+  },
+  "nameservers": {
+    "message": "DNSとネームサーバー"
+  },
+  "domainStatus": {
+    "message": "ドメインのステータス"
+  },
+  "settings": {
+    "message": "設定"
+  },
+  "settingsIntro": {
+    "message": "言語の選択、登録リンクの変更、保存された検索データの管理ができます。"
+  },
+  "preferredRegistrar": {
+    "message": "優先レジストラ"
+  },
+  "registrarHelp": {
+    "message": "ドメインを登録できる可能性がある場合の登録ボタンに使用します。"
+  },
+  "cache": {
+    "message": "キャッシュ"
+  },
+  "clearCache": {
+    "message": "検索キャッシュを削除"
+  },
+  "back": {
+    "message": "← WHOISに戻る"
+  },
+  "openSettings": {
+    "message": "設定を開く"
+  },
+  "navigation": {
+    "message": "ポップアップのナビゲーション"
+  },
+  "language": {
+    "message": "言語"
+  },
+  "automatic": {
+    "message": "自動（ブラウザーの言語）"
+  },
+  "languageHelp": {
+    "message": "このポップアップに適用されます。ツールバーの表示はブラウザーの言語に従います。"
+  },
+  "registrarSaved": {
+    "message": "優先レジストラを保存しました。"
+  },
+  "cacheCleared": {
+    "message": "検索キャッシュを削除しました。"
+  },
+  "cacheEmpty": {
+    "message": "キャッシュはすでに空です。"
+  },
+  "checkAt": {
+    "message": "$1で確認",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "notAvailable": {
+    "message": "情報なし"
+  },
+  "privateCache": {
+    "message": "キャッシュなし（プライベートウィンドウ）"
+  },
+  "cachedNow": {
+    "message": "たった今キャッシュに保存"
+  },
+  "cachedAgo": {
+    "message": "$1キャッシュに保存",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "classicWhois": {
+    "message": "従来のWHOIS"
+  },
+  "noDomain": {
+    "message": "ウェブサイトのドメインがありません"
+  },
+  "unsupported": {
+    "message": "上にドメインを入力するか、HTTP/HTTPSのサイトを開いてください。"
+  },
+  "registryError": {
+    "message": "レジストリエラー（$1）。後でもう一度お試しください。",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "whoisError": {
+    "message": "WHOISサービスエラー（$1）。後でもう一度お試しください。",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "timeout": {
+    "message": "検索がタイムアウトしました。"
+  },
+  "lookupFailed": {
+    "message": "検索に失敗しました。もう一度お試しください。"
+  },
+  "languageSaved": {
+    "message": "言語を保存しました。"
+  }
+}

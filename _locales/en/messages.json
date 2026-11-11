@@ -1,0 +1,163 @@
+{
+  "dateFormat": {
+    "message": "Date format"
+  },
+  "dateFormatAutomatic": {
+    "message": "Automatic — $1",
+    "description": "$1 is an example date formatted using the browser regional locale."
+  },
+  "dateFormatHelp": {
+    "message": "Automatic follows your browser’s regional settings. All formats use your local timezone, independently of the interface language."
+  },
+  "dateFormatSaved": {
+    "message": "Date format saved."
+  },
+  "extensionName": {
+    "message": "WHOIS Lookup"
+  },
+  "extensionDescription": {
+    "message": "Look up any domain’s registration, registrar, dates, nameservers, and status."
+  },
+  "refresh": {
+    "message": "Refresh this lookup"
+  },
+  "editDomain": {
+    "message": "Enter another domain"
+  },
+  "domainLabel": {
+    "message": "Domain name or website URL"
+  },
+  "lookup": {
+    "message": "Look up"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "invalidDomain": {
+    "message": "Enter a valid domain name or HTTP/HTTPS website URL."
+  },
+  "loading": {
+    "message": "Querying WHOIS…"
+  },
+  "disclosure": {
+    "message": "The lookup domain is sent to its registry or the fallback WHOIS service."
+  },
+  "availability": {
+    "message": "Registration availability"
+  },
+  "possiblyAvailable": {
+    "message": "Possibly available"
+  },
+  "availabilityHelp": {
+    "message": "No registration record was found. Final availability is confirmed by the registrar."
+  },
+  "registration": {
+    "message": "Registration"
+  },
+  "registrar": {
+    "message": "Registrar"
+  },
+  "created": {
+    "message": "Created"
+  },
+  "updated": {
+    "message": "Updated"
+  },
+  "expires": {
+    "message": "Expires"
+  },
+  "nameservers": {
+    "message": "DNS & Nameservers"
+  },
+  "domainStatus": {
+    "message": "Domain status"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "settingsIntro": {
+    "message": "Choose your language, customize registration links, and manage saved lookup data."
+  },
+  "preferredRegistrar": {
+    "message": "Preferred registrar"
+  },
+  "registrarHelp": {
+    "message": "Used for the registration button when a domain appears to be available."
+  },
+  "cache": {
+    "message": "Cache"
+  },
+  "clearCache": {
+    "message": "Clear lookup cache"
+  },
+  "back": {
+    "message": "← Back to WHOIS"
+  },
+  "openSettings": {
+    "message": "Open settings"
+  },
+  "navigation": {
+    "message": "Popup navigation"
+  },
+  "language": {
+    "message": "Language"
+  },
+  "automatic": {
+    "message": "Automatic (browser language)"
+  },
+  "languageHelp": {
+    "message": "Applies to this popup. Browser toolbar text follows the browser language."
+  },
+  "registrarSaved": {
+    "message": "Preferred registrar saved."
+  },
+  "cacheCleared": {
+    "message": "Lookup cache cleared."
+  },
+  "cacheEmpty": {
+    "message": "Cache is already empty."
+  },
+  "checkAt": {
+    "message": "Check at $1",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "notAvailable": {
+    "message": "Not available"
+  },
+  "privateCache": {
+    "message": "not cached (private window)"
+  },
+  "cachedNow": {
+    "message": "cached just now"
+  },
+  "cachedAgo": {
+    "message": "cached $1",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "classicWhois": {
+    "message": "Classic WHOIS"
+  },
+  "noDomain": {
+    "message": "No website domain"
+  },
+  "unsupported": {
+    "message": "Enter a domain above, or open an HTTP/HTTPS website."
+  },
+  "registryError": {
+    "message": "Registry error ($1). Please try again later.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "whoisError": {
+    "message": "WHOIS service error ($1). Please try again later.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "timeout": {
+    "message": "The registry lookup timed out."
+  },
+  "lookupFailed": {
+    "message": "The registry lookup failed. Please try again."
+  },
+  "languageSaved": {
+    "message": "Language saved."
+  }
+}

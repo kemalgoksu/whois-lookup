@@ -2,6 +2,7 @@
  * CONSTANTS & FORMATTERS
  */
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+const MAX_CACHED_LOOKUPS = 100;
 const DEFAULT_REGISTRAR = 'namecheap';
 const extensionApi = globalThis.browser ?? globalThis.chrome;
 const REGISTRARS = {
@@ -19,12 +20,40 @@ const REGISTRARS = {
 let preferredRegistrar = DEFAULT_REGISTRAR;
 let currentDomain = '';
 let isPrivateLookup = false;
-const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto', style: 'short' });
-const dateFormatter = new Intl.DateTimeFormat('en-GB', { 
-    day: '2-digit', 
-    month: '2-digit', 
-    year: 'numeric' 
-});
+let lookupRevision = 0;
+let viewState = { kind: 'unsupported' };
+let settingsMessage = '';
+let rtf;
+let dateFormatter;
+const DATE_FORMATS = ['auto', 'dmy', 'mdy', 'ymd'];
+let dateFormat = 'auto';
+let stopFollowingTab = () => {};
+const t = (key, ...values) => I18n.t(key, ...values);
+function updateFormatters() {
+    rtf = new Intl.RelativeTimeFormat(I18n.locale, { numeric: 'auto', style: 'short' });
+    // Undefined preserves the browser's regional locale, including en-US vs en-GB.
+    // Leave timeZone unset to use the client's local timezone for every format.
+    dateFormatter = new Intl.DateTimeFormat(dateFormat === 'auto' ? undefined : 'en-US-u-ca-gregory-nu-latn', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
+function formatDate(date) {
+    if (dateFormat === 'auto') return dateFormatter.format(date);
+    const parts = Object.fromEntries(dateFormatter.formatToParts(date).map(part => [part.type, part.value]));
+    const year = parts.year.padStart(4, '0');
+    if (dateFormat === 'dmy') return `${parts.day}/${parts.month}/${year}`;
+    if (dateFormat === 'mdy') return `${parts.month}/${parts.day}/${year}`;
+    return `${year}-${parts.month}-${parts.day}`;
+}
+
+function updateDateFormatOptions() {
+    const regionalFormatter = new Intl.DateTimeFormat(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const example = regionalFormatter.format(new Date(2026, 10, 23, 12));
+    document.getElementById('date-format-auto').textContent = t('dateFormatAutomatic', example);
+}
 
 /**
  * UI HELPERS
@@ -46,16 +75,16 @@ function getRelativeDistance(date) {
     return rtf.format(diffInYears, 'year');
 }
 
-// Renders a date as "relative DD/MM/YYYY" without injecting HTML.
+// Renders a relative time and the selected absolute date format without HTML injection.
 function renderDateWithRelative(element, dateString) {
     element.replaceChildren();
     if (!dateString) {
-        element.textContent = 'N/A';
+        element.textContent = t('notAvailable');
         return;
     }
     const date = new Date(dateString);
     if (isNaN(date)) {
-        element.textContent = 'N/A';
+        element.textContent = t('notAvailable');
         return;
     }
 
@@ -65,81 +94,146 @@ function renderDateWithRelative(element, dateString) {
 
     const value = document.createElement('span');
     value.className = 'value-main';
-    value.textContent = dateFormatter.format(date);
+    value.textContent = formatDate(date);
     element.append(relative, ' ', value);
 }
 
-// Logic to turn aistudio.google.com -> google.com 
-// and bbc.co.uk -> bbc.co.uk
-function getBaseDomain(hostname) {
-    if (/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostname)) return hostname;
-    const parts = hostname.split('.');
-    if (parts.length <= 2) return hostname;
-
-    const sld = parts[parts.length - 2];
-    const multiPartSuffixes = ['com', 'co', 'net', 'org', 'edu', 'gov', 'ac'];
-
-    if (multiPartSuffixes.includes(sld) && parts.length > 2) {
-        return parts.slice(-3).join('.');
-    }
-    return parts.slice(-2).join('.');
-}
-
-/**
- * CORE LOGIC
- */
-
+// Both automatic and manual input use the same normalization and lookup flow.
 async function init() {
+    stopFollowingTab();
+    const stored = await extensionApi.storage.local.get(['language', 'dateFormat']);
+    dateFormat = DATE_FORMATS.includes(stored.dateFormat) ? stored.dateFormat : 'auto';
+    await I18n.setLanguage(stored.language || 'auto');
+    updateFormatters();
+    I18n.apply();
     await initSettings();
-    const tabs = await extensionApi.tabs.query({ active: true, currentWindow: true });
-    if (!tabs[0]?.url) {
-        showUnsupportedPage();
-        return;
-    }
-    isPrivateLookup = Boolean(tabs[0].incognito);
-
-    let url;
+    // extension.inIncognitoContext also covers tabs whose URL is unavailable.
+    isPrivateLookup = Boolean(extensionApi.extension?.inIncognitoContext);
+    let domain;
     try {
-        url = new URL(tabs[0].url);
+        const tabs = await extensionApi.tabs.query({ active: true, currentWindow: true });
+        const tab = tabs[0];
+        isPrivateLookup = isPrivateLookup || Boolean(tab?.incognito);
+        if (tab && extensionApi.tabs.onUpdated) {
+            const onUpdated = (tabId, changes, updatedTab) => {
+                if (tabId !== tab.id || (!('url' in changes) && !('pendingUrl' in changes) && !('status' in changes))) return;
+                try {
+                    const next = getTabDomain(updatedTab);
+                    if (next !== currentDomain) void fetchWhois(next, false);
+                } catch {
+                    ++lookupRevision;
+                    showUnsupportedPage();
+                }
+            };
+            extensionApi.tabs.onUpdated.addListener(onUpdated);
+            stopFollowingTab = () => extensionApi.tabs.onUpdated.removeListener(onUpdated);
+        }
+        domain = getTabDomain(tab);
     } catch {
         showUnsupportedPage();
-        return;
     }
+    initDomainEditor();
+    document.getElementById('refresh-btn').onclick = () => {
+        if (currentDomain) fetchWhois(currentDomain, true);
+    };
+    if (domain) await fetchWhois(domain, false);
+}
 
-    const isIpAddress = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(url.hostname) || url.hostname.includes(':');
-    if (!['http:', 'https:'].includes(url.protocol) || !url.hostname || isIpAddress) {
-        showUnsupportedPage();
-        return;
-    }
+function getTabDomain(tab) {
+    // A committed URL can still refer to the previous site during navigation.
+    const url = tab?.pendingUrl || tab?.url;
+    if (!url || !/^https?:\/\//i.test(url)) throw new Error('unsupported');
+    return DomainInput.normalize(url);
+}
 
-    const fullHostname = url.hostname.replace(/\.$/, '').toLowerCase();
-    const baseDomain = getBaseDomain(fullHostname);
-    currentDomain = baseDomain;
-
-    // Update Header UI
-    document.getElementById('domain-name').textContent = baseDomain;
-
-    // Check Cache
-    const cached = isPrivateLookup ? {} : await extensionApi.storage.local.get(baseDomain);
-    const now = Date.now();
-
-    if (cached[baseDomain] && (now - cached[baseDomain].timestamp < CACHE_DURATION)) {
-        displayData(cached[baseDomain].data, cached[baseDomain].timestamp);
-    } else {
-        fetchWhois(baseDomain);
-    }
-
-    document.getElementById('refresh-btn').onclick = () => fetchWhois(baseDomain);
+function initDomainEditor() {
+    const form = document.getElementById('domain-form');
+    const input = document.getElementById('domain-input');
+    const button = document.getElementById('edit-domain-btn');
+    const close = () => {
+        form.classList.add('hidden');
+        button.setAttribute('aria-expanded', 'false');
+        button.focus();
+    };
+    button.onclick = () => {
+        form.classList.remove('hidden');
+        button.setAttribute('aria-expanded', 'true');
+        input.value = currentDomain;
+        input.removeAttribute('aria-invalid');
+        document.getElementById('domain-input-error').textContent = '';
+        input.focus();
+        input.select();
+    };
+    document.getElementById('cancel-domain-btn').onclick = close;
+    form.onkeydown = event => {
+        if (event.key === 'Escape') { event.preventDefault(); close(); }
+    };
+    form.onsubmit = event => {
+        event.preventDefault();
+        let domain;
+        try { domain = DomainInput.normalize(input.value); } catch {
+            input.setAttribute('aria-invalid', 'true');
+            document.getElementById('domain-input-error').textContent = t('invalidDomain');
+            input.focus();
+            return;
+        }
+        close();
+        stopFollowingTab();
+        fetchWhois(domain, false);
+    };
 }
 
 function showUnsupportedPage() {
-    document.getElementById('domain-name').textContent = 'No website domain';
-    document.getElementById('refresh-btn').disabled = true;
-    showError('Open an HTTP or HTTPS website with a domain name, then try again.');
+    currentDomain = '';
+    viewState = { kind: 'unsupported' };
+    renderView();
+}
+
+function renderView() {
+    document.getElementById('domain-name').textContent = currentDomain || t('noDomain');
+    document.getElementById('refresh-btn').disabled = !currentDomain;
+    for (const id of ['loading', 'results', 'error', 'availability']) document.getElementById(id).classList.add('hidden');
+    switch (viewState.kind) {
+        case 'loading': toggleLoading(true); break;
+        case 'data': displayData(viewState.data, viewState.timestamp); break;
+        case 'available': showPossiblyAvailable(currentDomain); break;
+        case 'error': showError(t(viewState.code, viewState.status)); break;
+        default: showError(t('unsupported'));
+    }
+    updateRegisterButton();
 }
 
 async function initSettings() {
     initNavigation();
+    const dateSelect = document.getElementById('date-format-select');
+    dateSelect.value = dateFormat;
+    updateDateFormatOptions();
+    dateSelect.onchange = async () => {
+        dateFormat = DATE_FORMATS.includes(dateSelect.value) ? dateSelect.value : 'auto';
+        dateSelect.value = dateFormat;
+        updateFormatters();
+        renderView();
+        await extensionApi.storage.local.set({ dateFormat });
+        showSettingsStatus('dateFormatSaved');
+    };
+    const languageSelect = document.getElementById('language-select');
+    const languagePreference = await extensionApi.storage.local.get('language');
+    languageSelect.value = Object.hasOwn(I18n.languages, languagePreference.language) ? languagePreference.language : 'auto';
+    languageSelect.onchange = async () => {
+        const language = languageSelect.value;
+        // Start catalog loading before awaiting storage so the latest selection wins.
+        const applying = I18n.setLanguage(language);
+        await extensionApi.storage.local.set({ language });
+        await applying;
+        updateFormatters();
+        I18n.apply();
+        updateDateFormatOptions();
+        renderView();
+        if (document.getElementById('domain-input').getAttribute('aria-invalid') === 'true') {
+            document.getElementById('domain-input-error').textContent = t('invalidDomain');
+        }
+        showSettingsStatus('languageSaved');
+    };
     const stored = await extensionApi.storage.local.get('preferredRegistrar');
     preferredRegistrar = REGISTRARS[stored.preferredRegistrar]
         ? stored.preferredRegistrar
@@ -151,7 +245,7 @@ async function initSettings() {
         preferredRegistrar = select.value;
         await extensionApi.storage.local.set({ preferredRegistrar });
         updateRegisterButton();
-        showSettingsStatus('Preferred registrar saved.');
+        showSettingsStatus('registrarSaved');
     };
 
     document.getElementById('clear-cache-btn').onclick = clearLookupCache;
@@ -171,6 +265,7 @@ function initNavigation() {
         settingsPane.classList.toggle('hidden', !showSettings);
         whoisTab.classList.toggle('hidden', !showSettings);
         settingsTab.classList.toggle('hidden', showSettings);
+        document.getElementById(showSettings ? 'settings-title' : 'edit-domain-btn').focus();
     };
 
     whoisTab.onclick = () => activate(false);
@@ -184,49 +279,77 @@ async function clearLookupCache() {
         .map(([key]) => key);
 
     if (lookupKeys.length) await extensionApi.storage.local.remove(lookupKeys);
-    showSettingsStatus(lookupKeys.length ? 'Lookup cache cleared.' : 'Cache is already empty.');
+    showSettingsStatus(lookupKeys.length ? 'cacheCleared' : 'cacheEmpty');
 }
 
 function showSettingsStatus(message) {
     const status = document.getElementById('settings-status');
-    status.textContent = message;
+    settingsMessage = message;
+    status.textContent = t(message);
     window.setTimeout(() => {
-        if (status.textContent === message) status.textContent = '';
+        if (settingsMessage === message) { settingsMessage = ''; status.textContent = ''; }
     }, 2500);
 }
 
 function updateRegisterButton() {
     const registrar = REGISTRARS[preferredRegistrar];
-    document.getElementById('register-btn').textContent = `Check at ${registrar.name}`;
+    document.getElementById('register-btn').textContent = t('checkAt', registrar.name);
 }
 
-async function fetchWhois(domain) {
-    toggleLoading(true);
+async function fetchWhois(domain, force = true) {
+    const revision = ++lookupRevision;
+    currentDomain = domain;
+    viewState = { kind: 'loading' };
+    renderView();
     try {
-        // Send message to background.js (which uses IANA bootstrap)
-        const response = await extensionApi.runtime.sendMessage({
-            action: "fetchWhois",
-            domain: domain
-        });
-
-        if (response.possiblyAvailable) {
-            showPossiblyAvailable(domain);
-            return;
+        if (!force && !isPrivateLookup) {
+            // Cache availability must not prevent a network lookup.
+            const cached = await extensionApi.storage.local.get(domain).catch(() => ({}));
+            if (revision !== lookupRevision) return;
+            const entry = cached[domain];
+            if (entry?.data && Number.isFinite(entry.timestamp) && Date.now() - entry.timestamp < CACHE_DURATION) {
+                viewState = { kind: 'data', data: entry.data, timestamp: entry.timestamp };
+                return;
+            }
         }
-        if (response.error) throw new Error(response.error);
-
-        const data = response.data;
-        const timestamp = Date.now();
-
-        // Save to cache
-        if (!isPrivateLookup) {
-            await extensionApi.storage.local.set({ [domain]: { data, timestamp } });
+        const response = await extensionApi.runtime.sendMessage({ action: 'fetchWhois', domain });
+        if (revision !== lookupRevision) return;
+        if (response?.possiblyAvailable) {
+            viewState = { kind: 'available' };
+        } else if (response?.error) {
+            const codes = { INVALID_DOMAIN: 'invalidDomain', REGISTRY_ERROR: 'registryError', WHOIS_ERROR: 'whoisError', TIMEOUT: 'timeout', LOOKUP_FAILED: 'lookupFailed' };
+            viewState = { kind: 'error', code: codes[response.errorCode] || 'lookupFailed', status: response.status };
+        } else if (response?.data) {
+            const timestamp = Date.now();
+            viewState = { kind: 'data', data: response.data, timestamp };
+            renderView();
+            // Show the result immediately; persistence is best-effort.
+            if (!isPrivateLookup) await cacheLookup(domain, response.data, timestamp);
+        } else {
+            viewState = { kind: 'error', code: 'lookupFailed' };
         }
-        displayData(data, timestamp);
-    } catch (err) {
-        showError(err.message);
+    } catch {
+        if (revision === lookupRevision) viewState = { kind: 'error', code: 'lookupFailed' };
     } finally {
-        toggleLoading(false);
+        if (revision === lookupRevision) renderView();
+    }
+}
+
+async function cacheLookup(domain, data, timestamp) {
+    try {
+        const stored = await extensionApi.storage.local.get(null);
+        const entries = Object.entries(stored)
+            .filter(([key, item]) => key !== domain && item?.data && typeof item.timestamp === 'number')
+            .sort((a, b) => b[1].timestamp - a[1].timestamp);
+        let retained = 0;
+        const remove = entries.filter(([, item]) => {
+            if (!Number.isFinite(item.timestamp) || timestamp - item.timestamp >= CACHE_DURATION || item.timestamp > timestamp) return true;
+            return ++retained >= MAX_CACHED_LOOKUPS;
+        }).map(([key]) => key);
+        if (remove.length) await extensionApi.storage.local.remove(remove);
+        await extensionApi.storage.local.set({ [domain]: { data, timestamp } });
+    } catch {
+        // A full or unavailable cache must not turn a successful lookup into an error.
     }
 }
 
@@ -238,14 +361,14 @@ function displayData(data, timestamp) {
     // 1. Cache footer relative time
     const cacheMinutes = Math.round((timestamp - Date.now()) / 60000);
     document.getElementById('cache-status').textContent = isPrivateLookup
-        ? 'not cached (private window)'
-        : `cached ${cacheMinutes === 0 ? "just now" : rtf.format(cacheMinutes, 'minute')}`;
+        ? t('privateCache')
+        : (cacheMinutes === 0 ? t('cachedNow') : t('cachedAgo', rtf.format(cacheMinutes, 'minute')));
     document.getElementById('lookup-source').textContent =
-        data._lookupSource === 'WHOIS' ? 'Classic WHOIS' : 'RDAP';
+        data._lookupSource === 'WHOIS' ? t('classicWhois') : 'RDAP';
 
     // 2. Registrar
     const regEntity = data.entities?.find(e => e.roles?.includes('registrar'));
-    const regName = regEntity?.vcardArray?.[1]?.find(p => p[0] === 'fn')?.[3] || "N/A";
+    const regName = regEntity?.vcardArray?.[1]?.find(p => p[0] === 'fn')?.[3] || t('notAvailable');
     document.getElementById('registrar').textContent = regName;
 
     // 3. Dates
@@ -267,7 +390,7 @@ function displayData(data, timestamp) {
             nsContainer.appendChild(span);
         });
     } else {
-        nsContainer.textContent = "N/A";
+        nsContainer.textContent = t('notAvailable');
     }
 
     // 5. Status Tags
@@ -276,10 +399,10 @@ function displayData(data, timestamp) {
     (data.status || []).forEach(s => {
         const span = document.createElement('span');
         span.className = 'status-tag';
-        span.textContent = s.replace(/ /g, '-');
+        span.textContent = s;
         statusContainer.appendChild(span);
     });
-    if (!statusContainer.children.length) statusContainer.textContent = 'N/A';
+    if (!statusContainer.children.length) statusContainer.textContent = t('notAvailable');
 }
 
 function showPossiblyAvailable(domain) {

@@ -1,0 +1,163 @@
+{
+  "dateFormat": {
+    "message": "Formato de data"
+  },
+  "dateFormatAutomatic": {
+    "message": "Automático — $1",
+    "description": "$1 is an example date formatted using the browser regional locale."
+  },
+  "dateFormatHelp": {
+    "message": "Automático segue as configurações regionais do navegador. Todos os formatos usam o fuso horário local, independentemente do idioma da interface."
+  },
+  "dateFormatSaved": {
+    "message": "Formato de data salvo."
+  },
+  "extensionName": {
+    "message": "WHOIS Lookup"
+  },
+  "extensionDescription": {
+    "message": "Consulte os dados de registro de qualquer domínio ou do site que está aberto na sua aba."
+  },
+  "refresh": {
+    "message": "Atualizar consulta"
+  },
+  "editDomain": {
+    "message": "Digitar outro domínio"
+  },
+  "domainLabel": {
+    "message": "Nome de domínio ou URL do site"
+  },
+  "lookup": {
+    "message": "Consultar"
+  },
+  "cancel": {
+    "message": "Cancelar"
+  },
+  "invalidDomain": {
+    "message": "Digite um domínio válido ou uma URL HTTP/HTTPS."
+  },
+  "loading": {
+    "message": "Consultando WHOIS…"
+  },
+  "disclosure": {
+    "message": "O domínio consultado é enviado ao registro ou ao serviço WHOIS alternativo."
+  },
+  "availability": {
+    "message": "Disponibilidade para registro"
+  },
+  "possiblyAvailable": {
+    "message": "Possivelmente disponível"
+  },
+  "availabilityHelp": {
+    "message": "Nenhum registro encontrado. A disponibilidade final é confirmada pelo registrador."
+  },
+  "registration": {
+    "message": "Registro"
+  },
+  "registrar": {
+    "message": "Registrador"
+  },
+  "created": {
+    "message": "Criação"
+  },
+  "updated": {
+    "message": "Atualização"
+  },
+  "expires": {
+    "message": "Expiração"
+  },
+  "nameservers": {
+    "message": "DNS e servidores de nomes"
+  },
+  "domainStatus": {
+    "message": "Status do domínio"
+  },
+  "settings": {
+    "message": "Configurações"
+  },
+  "settingsIntro": {
+    "message": "Escolha o idioma, personalize os links de registro e gerencie as consultas salvas."
+  },
+  "preferredRegistrar": {
+    "message": "Registrador preferido"
+  },
+  "registrarHelp": {
+    "message": "Usado no botão de registro quando um domínio parece estar disponível."
+  },
+  "cache": {
+    "message": "Cache"
+  },
+  "clearCache": {
+    "message": "Limpar cache de consultas"
+  },
+  "back": {
+    "message": "← Voltar ao WHOIS"
+  },
+  "openSettings": {
+    "message": "Abrir configurações"
+  },
+  "navigation": {
+    "message": "Navegação da janela"
+  },
+  "language": {
+    "message": "Idioma"
+  },
+  "automatic": {
+    "message": "Automático (idioma do navegador)"
+  },
+  "languageHelp": {
+    "message": "Aplica-se a esta janela. O texto da barra do navegador segue o idioma do navegador."
+  },
+  "registrarSaved": {
+    "message": "Registrador preferido salvo."
+  },
+  "cacheCleared": {
+    "message": "Cache de consultas limpo."
+  },
+  "cacheEmpty": {
+    "message": "O cache já está vazio."
+  },
+  "checkAt": {
+    "message": "Verificar em $1",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "notAvailable": {
+    "message": "Não disponível"
+  },
+  "privateCache": {
+    "message": "sem cache (janela privativa)"
+  },
+  "cachedNow": {
+    "message": "salvo no cache agora"
+  },
+  "cachedAgo": {
+    "message": "salvo no cache $1",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "classicWhois": {
+    "message": "WHOIS clássico"
+  },
+  "noDomain": {
+    "message": "Nenhum domínio de site"
+  },
+  "unsupported": {
+    "message": "Digite um domínio acima ou abra um site HTTP/HTTPS."
+  },
+  "registryError": {
+    "message": "Erro do registro ($1). Tente novamente mais tarde.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "whoisError": {
+    "message": "Erro do serviço WHOIS ($1). Tente novamente mais tarde.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "timeout": {
+    "message": "O tempo limite da consulta foi excedido."
+  },
+  "lookupFailed": {
+    "message": "A consulta falhou. Tente novamente."
+  },
+  "languageSaved": {
+    "message": "Idioma salvo."
+  }
+}

@@ -6,7 +6,35 @@ Thumbs.db
 *.swp
 *.swo
 
+# Local secrets and account configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+.envrc
+.dev.vars
+.dev.vars.*
+.npmrc
+.netrc
+_netrc
+.git-credentials
+.aws/
+.ssh/
+credentials.json
+credentials.*.json
+service-account*.json
+
+# Private keys and signing credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
 # Local packages and signing output
+node_modules/
 web-ext-artifacts/
 build/
 output/

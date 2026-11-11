@@ -1,9 +1,12 @@
+// Chrome service workers import their local dependencies; Firefox lists them in its manifest.
+if (typeof importScripts === 'function') importScripts('vendor/tldts.js', 'domain.js');
 const IANA_DNS_BOOTSTRAP = "https://data.iana.org/rdap/dns.json";
 const WHOIS_FALLBACK_URL = "https://who-dat.as93.net/";
 const BOOTSTRAP_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 const REQUEST_TIMEOUT = 20 * 1000;
 const POSSIBLY_AVAILABLE = "Possibly available — no registration record was found.";
 const extensionApi = globalThis.browser ?? globalThis.chrome;
+let bootstrapRefresh;
 
 function fetchWithTimeout(url, options = {}) {
   return fetch(url, {
@@ -13,7 +16,14 @@ function fetchWithTimeout(url, options = {}) {
 }
 
 // 1. Fetch and Cache the TLD map from IANA
-async function updateBootstrap() {
+function updateBootstrap() {
+  if (!bootstrapRefresh) {
+    bootstrapRefresh = refreshBootstrap().finally(() => { bootstrapRefresh = undefined; });
+  }
+  return bootstrapRefresh;
+}
+
+async function refreshBootstrap() {
   try {
     const response = await fetchWithTimeout(IANA_DNS_BOOTSTRAP, {
       headers: { "Accept": "application/json" }
@@ -43,10 +53,13 @@ async function getBaseRdapUrl(tld) {
     "bootstrapTimestamp"
   ]);
   
-  // If no bootstrap, or it's older than 7 days, refresh it
-  if (!bootstrap || !bootstrapTimestamp || Date.now() - bootstrapTimestamp > BOOTSTRAP_MAX_AGE) {
+  // Only a cold cache must wait for IANA. Use a stale map immediately while
+  // refreshing it, so an unrelated slow IANA request cannot delay the registry.
+  if (!Array.isArray(bootstrap?.services)) {
     await updateBootstrap();
     ({ bootstrap } = await extensionApi.storage.local.get("bootstrap"));
+  } else if (!bootstrapTimestamp || Date.now() - bootstrapTimestamp > BOOTSTRAP_MAX_AGE) {
+    void updateBootstrap();
   }
 
   if (!bootstrap?.services) return null;
@@ -56,7 +69,7 @@ async function getBaseRdapUrl(tld) {
   const service = bootstrap.services.find(s => s[0].includes(tld.toLowerCase()));
   
   if (service && service[1] && service[1].length > 0) {
-    // Host access is HTTPS-only, so ignore insecure registry endpoints.
+    // Use only encrypted registry endpoints. Requests rely on server CORS support.
     return service[1].find(url => url.startsWith("https://")) || null;
   }
   return null;
@@ -126,7 +139,7 @@ async function fetchClassicWhois(domain) {
   });
 
   if (response.status === 404) throw new Error(POSSIBLY_AVAILABLE);
-  if (!response.ok) throw new Error(`WHOIS service error (${response.status})`);
+  if (!response.ok) throw Object.assign(new Error(`WHOIS service error (${response.status})`), { errorCode: 'WHOIS_ERROR', status: response.status });
 
   const data = await response.json();
   if (data.error) {
@@ -142,7 +155,12 @@ async function handleMessage(message) {
   if (message.action === "fetchWhois") {
     const domain = String(message.domain || "").toLowerCase();
     if (!/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(domain)) {
-      return { error: "Invalid domain name." };
+      return { error: "Invalid domain name.", errorCode: 'INVALID_DOMAIN' };
+    }
+    try {
+      if (DomainInput.normalize(domain) !== domain) return { error: "Invalid domain name.", errorCode: 'INVALID_DOMAIN' };
+    } catch {
+      return { error: "Invalid domain name.", errorCode: 'INVALID_DOMAIN' };
     }
     const parts = domain.split('.');
     const tld = parts[parts.length - 1];
@@ -161,15 +179,15 @@ async function handleMessage(message) {
       if (response.status === 404) {
         return { possiblyAvailable: true };
       }
-      if (!response.ok) return { error: `Registry error (${response.status})` };
+      if (!response.ok) return { error: `Registry error (${response.status})`, errorCode: 'REGISTRY_ERROR', status: response.status };
 
       const data = await response.json();
       data._lookupSource = "RDAP";
       return { data };
     } catch (err) {
       if (err.message === POSSIBLY_AVAILABLE) return { possiblyAvailable: true };
-      if (err.name === "TimeoutError") return { error: "The registry lookup timed out." };
-      return { error: err.message || "The registry lookup failed." };
+      if (err.name === "TimeoutError") return { error: "The registry lookup timed out.", errorCode: 'TIMEOUT' };
+      return { error: err.message || "The registry lookup failed.", errorCode: err.errorCode || 'LOOKUP_FAILED', ...(err.status ? { status: err.status } : {}) };
     }
   }
 }
@@ -181,7 +199,7 @@ extensionApi.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action !== "fetchWhois") return false;
 
   handleMessage(message).then(sendResponse, error => {
-    sendResponse({ error: error.message || "The registry lookup failed." });
+    sendResponse({ error: error.message || "The registry lookup failed.", errorCode: 'LOOKUP_FAILED' });
   });
   return true;
 });

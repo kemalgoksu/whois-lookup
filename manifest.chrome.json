@@ -1,16 +1,18 @@
 {
   "manifest_version": 3,
-  "name": "WHOIS Lookup",
-  "version": "2.0.1",
-  "description": "Look up domain registration, registrar, dates, nameservers, and status from your browser toolbar.",
+  "name": "__MSG_extensionName__",
+  "version": "2.1.0",
+  "description": "__MSG_extensionDescription__",
   "minimum_chrome_version": "103",
-  "permissions": ["storage", "activeTab"],
-  "host_permissions": ["https://*/*"],
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
-    "default_title": "WHOIS Lookup",
+    "default_title": "__MSG_extensionName__",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",
@@ -20,9 +22,11 @@
     }
   },
   "icons": {
+    "128": "icons/icon-128.png",
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png"
-  }
+  },
+  "default_locale": "en"
 }

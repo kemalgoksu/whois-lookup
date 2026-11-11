@@ -1,0 +1,163 @@
+{
+  "dateFormat": {
+    "message": "Tarih biçimi"
+  },
+  "dateFormatAutomatic": {
+    "message": "Otomatik — $1",
+    "description": "$1 is an example date formatted using the browser regional locale."
+  },
+  "dateFormatHelp": {
+    "message": "Otomatik seçenek tarayıcınızın bölgesel ayarlarını izler. Tüm biçimler, arayüz dilinden bağımsız olarak yerel saat diliminizi kullanır."
+  },
+  "dateFormatSaved": {
+    "message": "Tarih biçimi kaydedildi."
+  },
+  "extensionName": {
+    "message": "WHOIS Lookup"
+  },
+  "extensionDescription": {
+    "message": "Açık sekmedeki sitenin veya merak ettiğiniz bir alan adının kayıt bilgilerini sorgulayın."
+  },
+  "refresh": {
+    "message": "Sorguyu yenile"
+  },
+  "editDomain": {
+    "message": "Başka bir alan adı gir"
+  },
+  "domainLabel": {
+    "message": "Alan adı veya web sitesi adresi"
+  },
+  "lookup": {
+    "message": "Sorgula"
+  },
+  "cancel": {
+    "message": "İptal"
+  },
+  "invalidDomain": {
+    "message": "Geçerli bir alan adı veya HTTP/HTTPS web sitesi adresi girin."
+  },
+  "loading": {
+    "message": "WHOIS sorgulanıyor…"
+  },
+  "disclosure": {
+    "message": "Sorgulanan alan adı, ilgili sicil kuruluşuna veya alternatif WHOIS hizmetine gönderilir."
+  },
+  "availability": {
+    "message": "Kayıt uygunluğu"
+  },
+  "possiblyAvailable": {
+    "message": "Kayda uygun olabilir"
+  },
+  "availabilityHelp": {
+    "message": "Kayıt bulunamadı. Kesin uygunluk, kayıt kuruluşu tarafından doğrulanır."
+  },
+  "registration": {
+    "message": "Kayıt"
+  },
+  "registrar": {
+    "message": "Kayıt kuruluşu"
+  },
+  "created": {
+    "message": "Oluşturulma"
+  },
+  "updated": {
+    "message": "Güncellenme"
+  },
+  "expires": {
+    "message": "Bitiş"
+  },
+  "nameservers": {
+    "message": "DNS ve ad sunucuları"
+  },
+  "domainStatus": {
+    "message": "Alan adı durumu"
+  },
+  "settings": {
+    "message": "Ayarlar"
+  },
+  "settingsIntro": {
+    "message": "Dili seçin, kayıt bağlantılarını özelleştirin ve kaydedilen sorgu verilerini yönetin."
+  },
+  "preferredRegistrar": {
+    "message": "Tercih edilen kayıt kuruluşu"
+  },
+  "registrarHelp": {
+    "message": "Alan adı kayda uygun göründüğünde kayıt düğmesi için kullanılır."
+  },
+  "cache": {
+    "message": "Önbellek"
+  },
+  "clearCache": {
+    "message": "Sorgu önbelleğini temizle"
+  },
+  "back": {
+    "message": "← WHOIS’e dön"
+  },
+  "openSettings": {
+    "message": "Ayarları aç"
+  },
+  "navigation": {
+    "message": "Açılır pencere gezinmesi"
+  },
+  "language": {
+    "message": "Dil"
+  },
+  "automatic": {
+    "message": "Otomatik (tarayıcı dili)"
+  },
+  "languageHelp": {
+    "message": "Bu pencereye uygulanır. Tarayıcı araç çubuğu metni tarayıcı dilini izler."
+  },
+  "registrarSaved": {
+    "message": "Kayıt kuruluşu tercihi kaydedildi."
+  },
+  "cacheCleared": {
+    "message": "Sorgu önbelleği temizlendi."
+  },
+  "cacheEmpty": {
+    "message": "Önbellek zaten boş."
+  },
+  "checkAt": {
+    "message": "$1 ile kontrol et",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "notAvailable": {
+    "message": "Bilgi yok"
+  },
+  "privateCache": {
+    "message": "önbelleğe alınmadı (gizli pencere)"
+  },
+  "cachedNow": {
+    "message": "az önce önbelleğe alındı"
+  },
+  "cachedAgo": {
+    "message": "$1 önbelleğe alındı",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "classicWhois": {
+    "message": "Klasik WHOIS"
+  },
+  "noDomain": {
+    "message": "Web sitesi alan adı yok"
+  },
+  "unsupported": {
+    "message": "Yukarıdan bir alan adı girin veya HTTP/HTTPS web sitesi açın."
+  },
+  "registryError": {
+    "message": "Sicil kuruluşu hatası ($1). Lütfen daha sonra tekrar deneyin.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "whoisError": {
+    "message": "WHOIS hizmeti hatası ($1). Lütfen daha sonra tekrar deneyin.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "timeout": {
+    "message": "Sorgu zaman aşımına uğradı."
+  },
+  "lookupFailed": {
+    "message": "Sorgu başarısız oldu. Lütfen tekrar deneyin."
+  },
+  "languageSaved": {
+    "message": "Dil kaydedildi."
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "dateFormat": {
+    "message": "Datumsformat"
+  },
+  "dateFormatAutomatic": {
+    "message": "Automatisch — $1",
+    "description": "$1 is an example date formatted using the browser regional locale."
+  },
+  "dateFormatHelp": {
+    "message": "Automatisch folgt den Regionseinstellungen des Browsers. Alle Formate verwenden die lokale Zeitzone, unabhängig von der Oberflächensprache."
+  },
+  "dateFormatSaved": {
+    "message": "Datumsformat gespeichert."
+  },
+  "extensionName": {
+    "message": "WHOIS Lookup"
+  },
+  "extensionDescription": {
+    "message": "Fragen Sie die Registrierungsdaten einer beliebigen Domain oder der Website im aktuellen Tab ab."
+  },
+  "refresh": {
+    "message": "Abfrage aktualisieren"
+  },
+  "editDomain": {
+    "message": "Andere Domain eingeben"
+  },
+  "domainLabel": {
+    "message": "Domainname oder Website-URL"
+  },
+  "lookup": {
+    "message": "Abfragen"
+  },
+  "cancel": {
+    "message": "Abbrechen"
+  },
+  "invalidDomain": {
+    "message": "Geben Sie einen gültigen Domainnamen oder eine HTTP-/HTTPS-URL ein."
+  },
+  "loading": {
+    "message": "WHOIS wird abgefragt…"
+  },
+  "disclosure": {
+    "message": "Die abgefragte Domain wird an die Registry oder den alternativen WHOIS-Dienst gesendet."
+  },
+  "availability": {
+    "message": "Verfügbarkeit zur Registrierung"
+  },
+  "possiblyAvailable": {
+    "message": "Möglicherweise verfügbar"
+  },
+  "availabilityHelp": {
+    "message": "Kein Registrierungseintrag gefunden. Die endgültige Verfügbarkeit bestätigt der Registrar."
+  },
+  "registration": {
+    "message": "Registrierung"
+  },
+  "registrar": {
+    "message": "Registrar"
+  },
+  "created": {
+    "message": "Erstellt"
+  },
+  "updated": {
+    "message": "Aktualisiert"
+  },
+  "expires": {
+    "message": "Läuft ab"
+  },
+  "nameservers": {
+    "message": "DNS und Nameserver"
+  },
+  "domainStatus": {
+    "message": "Domainstatus"
+  },
+  "settings": {
+    "message": "Einstellungen"
+  },
+  "settingsIntro": {
+    "message": "Sprache wählen, Registrierungslinks anpassen und gespeicherte Abfragen verwalten."
+  },
+  "preferredRegistrar": {
+    "message": "Bevorzugter Registrar"
+  },
+  "registrarHelp": {
+    "message": "Wird für die Registrierungsschaltfläche verwendet, wenn eine Domain verfügbar erscheint."
+  },
+  "cache": {
+    "message": "Cache"
+  },
+  "clearCache": {
+    "message": "Abfragecache leeren"
+  },
+  "back": {
+    "message": "← Zurück zu WHOIS"
+  },
+  "openSettings": {
+    "message": "Einstellungen öffnen"
+  },
+  "navigation": {
+    "message": "Popup-Navigation"
+  },
+  "language": {
+    "message": "Sprache"
+  },
+  "automatic": {
+    "message": "Automatisch (Browsersprache)"
+  },
+  "languageHelp": {
+    "message": "Gilt für dieses Popup. Der Text in der Browser-Symbolleiste folgt der Browsersprache."
+  },
+  "registrarSaved": {
+    "message": "Bevorzugter Registrar gespeichert."
+  },
+  "cacheCleared": {
+    "message": "Abfragecache geleert."
+  },
+  "cacheEmpty": {
+    "message": "Der Cache ist bereits leer."
+  },
+  "checkAt": {
+    "message": "Bei $1 prüfen",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "notAvailable": {
+    "message": "Nicht verfügbar"
+  },
+  "privateCache": {
+    "message": "nicht gespeichert (privates Fenster)"
+  },
+  "cachedNow": {
+    "message": "gerade gespeichert"
+  },
+  "cachedAgo": {
+    "message": "$1 gespeichert",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "classicWhois": {
+    "message": "Klassisches WHOIS"
+  },
+  "noDomain": {
+    "message": "Keine Website-Domain"
+  },
+  "unsupported": {
+    "message": "Geben Sie oben eine Domain ein oder öffnen Sie eine HTTP-/HTTPS-Website."
+  },
+  "registryError": {
+    "message": "Registry-Fehler ($1). Bitte später erneut versuchen.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "whoisError": {
+    "message": "WHOIS-Dienstfehler ($1). Bitte später erneut versuchen.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "timeout": {
+    "message": "Zeitüberschreitung bei der Abfrage."
+  },
+  "lookupFailed": {
+    "message": "Abfrage fehlgeschlagen. Bitte erneut versuchen."
+  },
+  "languageSaved": {
+    "message": "Sprache gespeichert."
+  }
+}

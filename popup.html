@@ -13,40 +13,53 @@
         <div class="domain-info">
           <h1 id="domain-name">...</h1>
         </div>
-        <button id="refresh-btn" type="button" title="Refresh this lookup" aria-label="Refresh this lookup">&#8635;</button>
+        <div class="header-actions">
+          <button id="edit-domain-btn" class="icon-btn" type="button" data-i18n-title="editDomain" data-i18n-aria-label="editDomain" aria-expanded="false" aria-controls="domain-form"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m16 3 5 5-12 12-6 1 1-6Z M14 5l5 5"/></svg></button>
+          <button id="refresh-btn" class="icon-btn" type="button" data-i18n-title="refresh" data-i18n-aria-label="refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 7v5h-5 M20 12a8 8 0 1 0-2.34 5.66"/></svg></button>
+        </div>
       </header>
 
+      <form id="domain-form" class="card hidden" novalidate>
+        <label for="domain-input" data-i18n="domainLabel"></label>
+        <input id="domain-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="domain-input-error">
+        <div id="domain-input-error" class="input-error" role="alert"></div>
+        <div class="form-actions">
+          <button class="primary-btn" type="submit" data-i18n="lookup"></button>
+          <button id="cancel-domain-btn" class="secondary-btn" type="button" data-i18n="cancel"></button>
+        </div>
+      </form>
+
       <div id="loading" class="state-view hidden">
-        <div class="spinner"></div>
-        <p>Querying WHOIS...</p>
-        <small>The current domain is sent to its registry or the fallback WHOIS service.</small>
+        <div class="spinner" aria-hidden="true"></div>
+        <p data-i18n="loading">Querying WHOIS...</p>
+        <small data-i18n="disclosure">The current domain is sent to its registry or the fallback WHOIS service.</small>
       </div>
 
-      <div id="error" class="state-view hidden"></div>
+      <div id="error" class="state-view hidden" role="alert"></div>
 
       <section id="availability" class="card availability-card hidden">
-        <h3>Registration availability</h3>
-        <p>Possibly available</p>
-        <small>No registration record was found. Final availability is confirmed by the registrar.</small>
+        <h3 data-i18n="availability">Registration availability</h3>
+        <p data-i18n="possiblyAvailable">Possibly available</p>
+        <small data-i18n="availabilityHelp">No registration record was found. Final availability is confirmed by the registrar.</small>
         <button id="register-btn" class="primary-btn" type="button"></button>
       </section>
 
       <main id="results" class="hidden">
         <section class="card">
-          <h3>Registration</h3>
-          <div class="grid-row"><span class="label">Registrar</span><span id="registrar" class="value">-</span></div>
-          <div class="grid-row"><span class="label">Created</span><span id="created" class="value">-</span></div>
-          <div class="grid-row"><span class="label">Updated</span><span id="updated" class="value">-</span></div>
-          <div class="grid-row"><span class="label">Expires</span><span id="expiry" class="value">-</span></div>
+          <h3 data-i18n="registration">Registration</h3>
+          <div class="grid-row"><span class="label" data-i18n="registrar">Registrar</span><span id="registrar" class="value">-</span></div>
+          <div class="grid-row"><span class="label" data-i18n="created">Created</span><span id="created" class="value">-</span></div>
+          <div class="grid-row"><span class="label" data-i18n="updated">Updated</span><span id="updated" class="value">-</span></div>
+          <div class="grid-row"><span class="label" data-i18n="expires">Expires</span><span id="expiry" class="value">-</span></div>
         </section>
 
         <section class="card">
-          <h3>DNS &amp; Nameservers</h3>
+          <h3 data-i18n="nameservers">DNS &amp; Nameservers</h3>
           <div id="nameservers-list" class="tag-container"></div>
         </section>
 
         <section class="card">
-          <h3>Domain Status</h3>
+          <h3 data-i18n="domainStatus">Domain Status</h3>
           <div id="status-container" class="tag-container"></div>
         </section>
 
@@ -57,12 +70,38 @@
     </section>
 
     <section id="settings-pane" class="tab-pane hidden">
-      <h2 class="settings-title">Settings</h2>
-      <p class="settings-intro">Customize registration links and manage saved lookup data.</p>
+      <header class="settings-heading">
+        <h2 id="settings-title" class="settings-title" tabindex="-1" data-i18n="settings">Settings</h2>
+        <button id="whois-tab" class="nav-action hidden" type="button"><span data-i18n="back">← Back to WHOIS</span></button>
+      </header>
+      <p class="settings-intro" data-i18n="settingsIntro">Customize registration links and manage saved lookup data.</p>
 
       <section class="card settings-card">
-        <h3>Registration</h3>
-        <label for="registrar-select">Preferred registrar</label>
+        <label for="language-select" data-i18n="language">Language</label>
+        <select id="language-select">
+          <option value="auto" data-i18n="automatic">Automatic</option>
+          <option value="en">English</option><option value="tr">Türkçe</option>
+          <option value="de">Deutsch</option><option value="es">Español</option>
+          <option value="fr">Français</option><option value="pt_BR">Português (Brasil)</option>
+          <option value="ja">日本語</option>
+        </select>
+        <p class="setting-help" data-i18n="languageHelp"></p>
+      </section>
+
+      <section class="card settings-card">
+        <label for="date-format-select" data-i18n="dateFormat">Date format</label>
+        <select id="date-format-select" aria-describedby="date-format-help">
+          <option id="date-format-auto" value="auto">Automatic (regional settings)</option>
+          <option value="dmy">DD/MM/YYYY — 23/11/2026</option>
+          <option value="mdy">MM/DD/YYYY — 11/23/2026</option>
+          <option value="ymd">YYYY-MM-DD — 2026-11-23</option>
+        </select>
+        <p id="date-format-help" class="setting-help" data-i18n="dateFormatHelp"></p>
+      </section>
+
+      <section class="card settings-card">
+        <h3 data-i18n="registration">Registration</h3>
+        <label for="registrar-select" data-i18n="preferredRegistrar">Preferred registrar</label>
         <select id="registrar-select">
           <option value="dynadot">Dynadot</option>
           <option value="porkbun">Porkbun</option>
@@ -75,21 +114,23 @@
           <option value="hostinger">Hostinger</option>
           <option value="namesilo">NameSilo</option>
         </select>
-        <p class="setting-help">Used for the registration button when a domain appears to be available.</p>
+        <p class="setting-help" data-i18n="registrarHelp">Used for the registration button when a domain appears to be available.</p>
       </section>
 
       <section class="card settings-card">
-        <h3>Cache</h3>
-        <button id="clear-cache-btn" class="secondary-btn" type="button">Clear lookup cache</button>
+        <h3 data-i18n="cache">Cache</h3>
+        <button id="clear-cache-btn" class="secondary-btn" type="button" data-i18n="clearCache">Clear lookup cache</button>
         <p id="settings-status" class="settings-status" aria-live="polite"></p>
       </section>
     </section>
 
-    <nav class="view-nav" aria-label="Popup navigation">
-      <button id="whois-tab" class="nav-action hidden" type="button"><span aria-hidden="true">&larr;</span> Back to WHOIS</button>
-      <button id="settings-tab" class="nav-action" type="button" title="Open settings"><span aria-hidden="true">&#9881;</span> Settings</button>
+    <nav class="view-nav" data-i18n-aria-label="navigation">
+      <button id="settings-tab" class="nav-action" type="button" data-i18n-title="openSettings"><span aria-hidden="true">&#9881;</span> <span data-i18n="settings">Settings</span></button>
     </nav>
   </div>
+  <script src="vendor/tldts.js"></script>
+  <script src="domain.js"></script>
+  <script src="i18n.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

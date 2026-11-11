@@ -1,0 +1,16 @@
+{
+  "name": "whois-lookup-extension",
+  "version": "2.1.0",
+  "private": true,
+  "scripts": {
+    "vendor": "node scripts/vendor.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.cjs",
+    "test:network": "node scripts/build.mjs && node scripts/network-check.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "puppeteer-core": "25.14.0",
+    "tldts": "7.4.18"
+  }
+}

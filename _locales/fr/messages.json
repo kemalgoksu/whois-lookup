@@ -1,0 +1,163 @@
+{
+  "dateFormat": {
+    "message": "Format de date"
+  },
+  "dateFormatAutomatic": {
+    "message": "Automatique — $1",
+    "description": "$1 is an example date formatted using the browser regional locale."
+  },
+  "dateFormatHelp": {
+    "message": "Le mode automatique suit les paramètres régionaux du navigateur. Tous les formats utilisent le fuseau horaire local, indépendamment de la langue de l’interface."
+  },
+  "dateFormatSaved": {
+    "message": "Format de date enregistré."
+  },
+  "extensionName": {
+    "message": "WHOIS Lookup"
+  },
+  "extensionDescription": {
+    "message": "Consultez les données d’enregistrement de n’importe quel domaine, y compris celui de l’onglet actif."
+  },
+  "refresh": {
+    "message": "Actualiser la recherche"
+  },
+  "editDomain": {
+    "message": "Saisir un autre domaine"
+  },
+  "domainLabel": {
+    "message": "Nom de domaine ou URL du site"
+  },
+  "lookup": {
+    "message": "Rechercher"
+  },
+  "cancel": {
+    "message": "Annuler"
+  },
+  "invalidDomain": {
+    "message": "Saisissez un nom de domaine valide ou une URL HTTP/HTTPS."
+  },
+  "loading": {
+    "message": "Recherche WHOIS en cours…"
+  },
+  "disclosure": {
+    "message": "Le domaine recherché est envoyé au registre ou au service WHOIS de secours."
+  },
+  "availability": {
+    "message": "Disponibilité à l’enregistrement"
+  },
+  "possiblyAvailable": {
+    "message": "Peut-être disponible"
+  },
+  "availabilityHelp": {
+    "message": "Aucun enregistrement trouvé. La disponibilité définitive est confirmée par le bureau d’enregistrement."
+  },
+  "registration": {
+    "message": "Enregistrement"
+  },
+  "registrar": {
+    "message": "Bureau d’enregistrement"
+  },
+  "created": {
+    "message": "Création"
+  },
+  "updated": {
+    "message": "Mise à jour"
+  },
+  "expires": {
+    "message": "Expiration"
+  },
+  "nameservers": {
+    "message": "DNS et serveurs de noms"
+  },
+  "domainStatus": {
+    "message": "Statut du domaine"
+  },
+  "settings": {
+    "message": "Paramètres"
+  },
+  "settingsIntro": {
+    "message": "Choisissez la langue, personnalisez les liens d’enregistrement et gérez les recherches enregistrées."
+  },
+  "preferredRegistrar": {
+    "message": "Bureau d’enregistrement préféré"
+  },
+  "registrarHelp": {
+    "message": "Utilisé pour le bouton d’enregistrement lorsqu’un domaine semble disponible."
+  },
+  "cache": {
+    "message": "Cache"
+  },
+  "clearCache": {
+    "message": "Vider le cache des recherches"
+  },
+  "back": {
+    "message": "← Retour à WHOIS"
+  },
+  "openSettings": {
+    "message": "Ouvrir les paramètres"
+  },
+  "navigation": {
+    "message": "Navigation de la fenêtre"
+  },
+  "language": {
+    "message": "Langue"
+  },
+  "automatic": {
+    "message": "Automatique (langue du navigateur)"
+  },
+  "languageHelp": {
+    "message": "S’applique à cette fenêtre. Le texte de la barre d’outils suit la langue du navigateur."
+  },
+  "registrarSaved": {
+    "message": "Préférence enregistrée."
+  },
+  "cacheCleared": {
+    "message": "Cache des recherches vidé."
+  },
+  "cacheEmpty": {
+    "message": "Le cache est déjà vide."
+  },
+  "checkAt": {
+    "message": "Vérifier chez $1",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "notAvailable": {
+    "message": "Indisponible"
+  },
+  "privateCache": {
+    "message": "sans cache (fenêtre privée)"
+  },
+  "cachedNow": {
+    "message": "mis en cache à l’instant"
+  },
+  "cachedAgo": {
+    "message": "mis en cache $1",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "classicWhois": {
+    "message": "WHOIS classique"
+  },
+  "noDomain": {
+    "message": "Aucun domaine de site web"
+  },
+  "unsupported": {
+    "message": "Saisissez un domaine ci-dessus ou ouvrez un site HTTP/HTTPS."
+  },
+  "registryError": {
+    "message": "Erreur du registre ($1). Réessayez plus tard.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "whoisError": {
+    "message": "Erreur du service WHOIS ($1). Réessayez plus tard.",
+    "description": "$1 is a registrar name, localized relative time, or HTTP status."
+  },
+  "timeout": {
+    "message": "Le délai de recherche est dépassé."
+  },
+  "lookupFailed": {
+    "message": "La recherche a échoué. Réessayez."
+  },
+  "languageSaved": {
+    "message": "Langue enregistrée."
+  }
+}
